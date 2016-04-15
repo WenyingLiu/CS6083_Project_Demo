@@ -3,6 +3,9 @@
 <head>
           <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 </head>
+<style>
+.error {color: #FF0000;}
+</style>
 <body>
 
 <h1>hw3</h1>
@@ -30,23 +33,24 @@ if (!$link) {
 echo 'Connected successfully';
 mysql_close($link);
  */
+?>
 
-$search = "";
-$searchErr = "";
+<?php
+$search = $searchErr = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST["search"])) {
           $searchErr = "Search keyword is required";
     }
     else {
-          $search = test_input($_POST["search"]);
+      $search = test_input($_POST["search"]);
+      if (!preg_match("/^[a-zA-Z ]*$/",$name)) {
+      $nameErr = "Only letters and white space allowed";}
           }
 }
 
 function test_input($data) {
      $data = trim($data);
-     $data = stripslashes($data);
-     $data = htmlspecialchars($data);
      return $data;
 }
 ?>
@@ -54,7 +58,7 @@ function test_input($data) {
 <h2>Search Keyword</h2>
 <p><span class="error">* required field.</span></p>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-   Search: <input type="text" name="search">
+   Search: <input type="text" name="search" value="<?php echo $search;?>">
    <span class="error">* <?php echo $searchErr;?></span>
    <br><br>
    <input type="submit" name="submit" value="Submit">
@@ -63,11 +67,12 @@ function test_input($data) {
 <?php
 echo '<h2> Search Result: </h2>';
 $searchSQL = "
-  SELECT DISTINCT table_name FROM information_schema.columns
-WHERE LOWER(column_name) LIKE LOWER('%$search%') AND table_schema = 'hw3'
+SELECT table_name FROM information_schema.tables
+WHERE LOWER(table_name) LIKE LOWER('%$search%') AND table_schema = 'hw3'
 ";
 
-$result = $conn->query($searchSQL);
+if ($search!='')
+{$result = $conn->query($searchSQL);
 
 echo '<form method="POST" action="show_columns.php">'; // opening form tag
 
@@ -78,9 +83,10 @@ if ($result->num_rows > 0) {
         echo "<input type='submit' name='table_name' value='$table_name' /> <br/>";
     }
 } else {
-  echo '0 result';}
+  echo '0 result';
+}} else {echo ' ';}
 
-echo '</form>'; // closing form tag
+echo'</form>'; // closing form tag
 ?>
 
 </body>
