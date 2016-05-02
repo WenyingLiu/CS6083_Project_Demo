@@ -1,5 +1,5 @@
 <?php
-$connection = mysql_connect('127.0.0.1', 'root', '196663');
+$connection = mysql_connect('127.0.0.1', 'root', '$password');
 if (!$connection){
 	 die("Database Connection Failed" . mysql_error());
 }
